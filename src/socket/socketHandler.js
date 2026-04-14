@@ -127,7 +127,7 @@ const socketHandler = (io) => {
 
     socket.on('call_rejected', (data) => {
       const { callId, matchId } = data;
-      socket.to(`match:${matchId}`).emit('call_rejected', { callId, rejectedBy: userId });
+      socket.to(`match:${matchId}`).emit('call_rejected', { callId, matchId, rejectedBy: userId });
     });
     
     // Handle disconnect
