@@ -429,12 +429,23 @@ router.post('/swipe',
           // Populate match with user info
           await match.populate('users', 'firstName photos');
           
-          // Emit socket event for real-time notification
+          // Emit socket event for real-time notification — both users get it
           const io = req.app.get('io');
           const matchedUserPublic = targetUser.toPublicProfile();
           const currentUserPublic = user.toPublicProfile();
-          
+
+          // Current user (swiper) sees the matched user's profile
           io.to(`user:${userId}`).emit('new_match', {
+            match: {
+              id: match._id,
+              user: matchedUserPublic,
+              matchedAt: match.matchedAt,
+              isSuperLike: match.isSuperLike,
+            },
+          });
+
+          // Matched user (swiped-on) sees the current user's profile
+          io.to(`user:${targetUser._id}`).emit('new_match', {
             match: {
               id: match._id,
               user: currentUserPublic,
