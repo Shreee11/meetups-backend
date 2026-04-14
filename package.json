@@ -1,0 +1,71 @@
+{
+  "name": "tender-backend",
+  "version": "1.0.0",
+  "description": "Tender - Dating App Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "start:cluster": "node src/cluster.js",
+    "start:prod": "pm2 start ecosystem.config.js --env production",
+    "dev": "nodemon src/server.js",
+    "worker:notifications": "node src/workers/notificationWorker.js",
+    "worker:emails": "node src/workers/emailWorker.js",
+    "indexes": "node src/scripts/createIndexes.js",
+    "test": "jest --runInBand --forceExit",
+    "lint": "eslint src/",
+    "seed": "node src/scripts/seed.js",
+    "seed:pune": "node src/scripts/seedPuneUsers.js",
+    "seed:pune:clean": "node src/scripts/seedPuneUsers.js --clean"
+  },
+  "keywords": [
+    "dating",
+    "tinder",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "agora-access-token": "^2.0.4",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.16.5",
+    "cloudinary": "^1.41.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "firebase-admin": "^12.0.0",
+    "geolib": "^3.3.4",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "rate-limit-redis": "^4.3.1",
+    "response-time": "^2.3.4",
+    "sanitize-html": "^2.11.0",
+    "socket.io": "^4.6.1",
+    "stripe": "^14.0.0",
+    "twilio": "^4.20.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

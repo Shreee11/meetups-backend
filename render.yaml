@@ -1,0 +1,82 @@
+services:
+  # ─── Backend API ──────────────────────────────────────────────────────────
+  - type: web
+    name: tender-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # ── MongoDB Atlas ──────────────────────────────────────────────────────
+      # Set this in the Render dashboard → Environment
+      - key: MONGODB_URI
+        sync: false
+
+      # ── JWT ───────────────────────────────────────────────────────────────
+      - key: JWT_SECRET
+        generateValue: true        # Render auto-generates a secure random value
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 90d
+
+      # ── Redis (linked to the Redis service below) ──────────────────────────
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: tender-redis
+          property: connectionString
+      - key: REDIS_ENABLED
+        value: "true"
+
+      # ── Cloudinary ────────────────────────────────────────────────────────
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      # ── Twilio (phone verification) ───────────────────────────────────────
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+      # ── App settings ──────────────────────────────────────────────────────
+      - key: MAX_PHOTOS_PER_USER
+        value: "9"
+      - key: MAX_SWIPES_PER_DAY
+        value: "100"
+      - key: SUPER_LIKES_PER_DAY
+        value: "1"
+      - key: DISCOVERY_RADIUS_KM
+        value: "100"
+      - key: PREMIUM_MAX_SWIPES
+        value: "-1"
+      - key: PREMIUM_SUPER_LIKES
+        value: "5"
+      - key: PREMIUM_BOOSTS_PER_MONTH
+        value: "1"
+
+      # ── Optional integrations (set in dashboard if used) ──────────────────
+      # STRIPE_SECRET_KEY
+      # STRIPE_WEBHOOK_SECRET
+      # AGORA_APP_ID
+      # AGORA_APP_CERTIFICATE
+      # FIREBASE_PROJECT_ID / FIREBASE_PRIVATE_KEY / FIREBASE_CLIENT_EMAIL
+      # CLIENT_URL  (comma-separated allowed origins)
+
+  # ─── Redis ────────────────────────────────────────────────────────────────
+  - type: redis
+    name: tender-redis
+    ipAllowList: []              # Only allow internal connections
+    plan: free
