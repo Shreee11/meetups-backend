@@ -15,29 +15,30 @@ const noopRedis = {
   disconnect: () => {},
 };
 
-// Support single REDIS_URL (used by Render, Railway, Heroku, etc.)
-const redisBaseConfig = process.env.REDIS_URL
-  ? { url: process.env.REDIS_URL }
-  : {
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT) || 6379,
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB) || 0,
-    };
-
-const redisConfig = {
-  ...redisBaseConfig,
-
-  // Connection pool & retry
+// ioredis v5: URL must be passed as first constructor arg, not as an option key.
+// Support REDIS_URL (Render/Railway/Heroku) or individual REDIS_HOST/PORT/PASSWORD vars.
+const redisClientOptions = {
   maxRetriesPerRequest: 1,
   enableOfflineQueue: false,
   connectTimeout: 3000,
   lazyConnect: true,
-
   retryStrategy(times) {
-    if (times > 2) return null; // Give up fast in dev
+    if (times > 2) return null; // Give up fast
     return Math.min(times * 200, 1000);
   },
+};
+
+const createRedisClient = () => {
+  if (process.env.REDIS_URL) {
+    return new Redis(process.env.REDIS_URL, redisClientOptions);
+  }
+  return new Redis({
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB) || 0,
+    ...redisClientOptions,
+  });
 };
 
 let redis = noopRedis;
@@ -45,9 +46,9 @@ let redisSub = noopRedis;
 let redisPub = noopRedis;
 
 if (REDIS_ENABLED) {
-  redis = new Redis(redisConfig);
-  redisSub = new Redis(redisConfig);
-  redisPub = new Redis(redisConfig);
+  redis = createRedisClient();
+  redisSub = createRedisClient();
+  redisPub = createRedisClient();
 
   // Suppress unhandled error events — they are handled in connectRedis
   redis.on('error', () => {});
